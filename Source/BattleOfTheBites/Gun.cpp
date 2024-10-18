@@ -97,3 +97,16 @@ AController* AGun::GetOwnerController() const
 	return OwnerPawn->GetController();
 }
 
+// Called when the game starts or when spawned
+void AGun::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+// Called every frame
+void AGun::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}
+
+
