@@ -13,6 +13,8 @@ class ABattleOfTheBitesGameMode : public AGameModeBase
 
 public:
 	ABattleOfTheBitesGameMode();
+
+	virtual void PawnKilled(APawn* PawnKilled);
 };
 
 

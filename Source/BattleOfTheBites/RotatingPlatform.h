@@ -23,4 +23,10 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+private:
+	UPROPERTY(EditAnyWhere, Category = "Rotating")
+	FRotator RotationVelocity = FRotator(0, 90, 0);
+
+	void Rotation(float DeltaTime);
+
 };

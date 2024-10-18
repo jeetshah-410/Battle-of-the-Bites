@@ -15,6 +15,8 @@ ARotatingPlatform::ARotatingPlatform()
 void ARotatingPlatform::BeginPlay()
 {
 	Super::BeginPlay();
+
+	FString Name = GetName();
 	
 }
 
@@ -22,6 +24,12 @@ void ARotatingPlatform::BeginPlay()
 void ARotatingPlatform::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	Rotation(DeltaTime);
+}
 
+void ARotatingPlatform::Rotation(float DeltaTime)
+{
+	FRotator CurrentRotation = GetActorRotation();
+	AddActorLocalRotation(RotationVelocity * DeltaTime);
 }
 

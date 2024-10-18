@@ -13,3 +13,7 @@ ABattleOfTheBitesGameMode::ABattleOfTheBitesGameMode()
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
 }
+
+void ABattleOfTheBitesGameMode::PawnKilled(APawn* PawnKilled)
+{
+}
