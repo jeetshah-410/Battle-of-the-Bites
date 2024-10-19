@@ -7,11 +7,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/Controller.h"
-#include "Kismet/GameplayStatics.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "BattleOfTheBitesGameMode.h"
-#include "Engine/DamageEvents.h"
 #include "Gun.h"
 #include "InputActionValue.h"
 
@@ -102,74 +100,12 @@ float ABattleOfTheBitesCharacter::TakeDamage(float DamageAmount, FDamageEvent co
 
 void ABattleOfTheBitesCharacter::Shoot()
 {
-	AController* OwnerController = GetOwnerController();
-	if (OwnerController == nullptr) return;
-
-	// Get the player's viewpoint (location and rotation)
-	FVector CameraLocation;
-	FRotator CameraRotation;
-	OwnerController->GetPlayerViewPoint(CameraLocation, CameraRotation);
-
-	// Calculate the direction the player should face
-	FVector AimDirection = CameraRotation.Vector();
-
-	// Calculate the desired yaw rotation to face the shooting direction (ignore pitch)
-	FRotator DesiredRotation = AimDirection.Rotation();
-	DesiredRotation.Pitch = 0;  // Only rotate around the yaw (horizontal) axis
-
-	// Set the player's rotation to face the direction of the shot
-	SetActorRotation(DesiredRotation);
-
-	// VFX for muzzle flash and sound
-	UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, GetMesh(), TEXT("MuzzleFlashSocket"));
-	UGameplayStatics::SpawnSoundAttached(MuzzleSound, GetMesh(), TEXT("MuzzleFlashSocket"));
-
-	// Perform the gun trace
-	FHitResult Hit;
-	FVector ShotDirection;
-	bool bSuccess = GunTrace(Hit, ShotDirection);
-
-	if (bSuccess)
-	{
-		// Spawn hit VFX and sound
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitFlash, Hit.Location, ShotDirection.Rotation());
-		UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, Hit.Location);
-
-		// Apply damage to the hit actor
-		AActor* HitActor = Hit.GetActor();
-		if (HitActor)
-		{
-			FPointDamageEvent DamageEvent(Damage, Hit, ShotDirection, nullptr);
-			HitActor->TakeDamage(Damage, DamageEvent, OwnerController, this);
-		}
-	}
+	Gun->PullTrigger();
 }
 
-bool ABattleOfTheBitesCharacter::GunTrace(FHitResult& Hit, FVector& ShotDirection)
+AGun* ABattleOfTheBitesCharacter::GetGun() const
 {
-	AController* OwnerController = GetOwnerController();
-
-	if (OwnerController == nullptr) return false;
-
-	FVector Location;
-	FRotator Rotation;
-
-	OwnerController->GetPlayerViewPoint(Location, Rotation);
-	ShotDirection = -Rotation.Vector();
-
-	FVector End = Location + Rotation.Vector() * MaxRange;
-
-	FCollisionQueryParams Params;
-
-	Params.AddIgnoredActor(this);
-	Params.AddIgnoredActor(GetOwner());
-
-	return GetWorld()->LineTraceSingleByChannel(Hit, Location, End, ECollisionChannel::ECC_GameTraceChannel1, Params);
-}
-
-AController* ABattleOfTheBitesCharacter::GetOwnerController() const
-{
-	return Cast<AController>(GetController());
+	return Gun;
 }
 
 
